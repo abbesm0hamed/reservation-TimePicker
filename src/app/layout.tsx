@@ -3,8 +3,8 @@ import "./globals.css"
 export const metadata = {
   description: "Create a custom calendar with date-fns",
   title: {
-    default: "Custom-Clandar",
-    template: "%s | Custom-Clandar",
+    default: "Custom-Calendar",
+    template: "%s | Custom-Calendar",
   },
   viewport: "width=device-width, initial-scale=1",
   keywords: [
