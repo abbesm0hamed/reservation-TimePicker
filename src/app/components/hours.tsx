@@ -9,10 +9,6 @@ import { cn } from "../lib/utils"
 const AvailableHours = memo(({ freeTimes }: { freeTimes: Date[] }) => {
   const [selectedTime, setSelectedTime] = useState<Date>()
 
-  useMemo(() => {
-    console.log(selectedTime)
-  }, [selectedTime])
-
   return (
     <div className="flex flex-col items-center gap-2 mt-4 p-4">
       <span>
