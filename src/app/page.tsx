@@ -4,6 +4,8 @@ import { useMemo, useState } from "react"
 import { cn, dayNames } from "./lib/utils"
 import {
   add,
+  addDays,
+  addHours,
   eachDayOfInterval,
   eachMinuteOfInterval,
   endOfDay,
@@ -11,6 +13,7 @@ import {
   endOfWeek,
   format,
   getDay,
+  isAfter,
   isBefore,
   isEqual,
   isSameMonth,
@@ -22,6 +25,7 @@ import {
   startOfDay,
   startOfToday,
   startOfWeek,
+  startOfYesterday,
 } from "date-fns"
 import { Inter } from "next/font/google"
 import { CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react"
@@ -30,16 +34,10 @@ import TimesBar from "./components/timesBar"
 
 const inter = Inter({ subsets: ["latin"], weight: "400" })
 
-const reservations = [
-  "Wed Apr 26 2023 13:00:00 GMT+0100 (Central European Standard Time)",
-  "Thu Apr 20 2023 16:00:00 GMT+0100 (Central European Standard Time)",
-  "Thu Apr 20 2023 12:00:00 GMT+0100 (Central European Standard Time)",
-  "Wed May 24 2023 10:00:00 GMT+0100 (Central European Standard Time)",
-  "Thu Apr 20 2023 02:00:00 GMT+0100 (Central European Standard Time)",
-  "Fri Apr 21 2023 02:00:00 GMT+0100 (Central European Standard Time)",
-]
+
 
 export default function Home() {
+  
   // display div of availables times
   const [calendarTouched, setCalendarTouched] = useState<Boolean>(false)
 
@@ -52,6 +50,18 @@ export default function Home() {
     start: startOfWeek(firstDayCurrentMonth, { weekStartsOn: 1 }),
     end: endOfWeek(endOfMonth(firstDayCurrentMonth), { weekStartsOn: 1 }),
   })
+
+  // console.log(addDays(new Date(addHours(today, 4)), 3).toString())
+  // reservations array 
+  const reservations = [
+    addHours(today, 5).toString(),
+    addHours(today, 6).toString(),
+    addHours(today, 7).toString(),
+    addHours(today, 8).toString(),
+    addHours(today, 9).toString(),
+    addDays(new Date(addHours(today, 4)), 3).toString(),
+  ]
+
 
   // send available times for the selected day to the hours component
   let [freeTimes, setFreeTimes] = useState<Date[]>([])
@@ -171,7 +181,9 @@ export default function Home() {
         {/* calendar body */}
         <div>
           <div className="grid grid-cols-7 mt-4">
-            {dayNames.map((day, i) => (
+            {dayNames.map((day, i) =>
+            {
+              return(
               <div
                 key={i}
                 className={cn(
@@ -184,7 +196,7 @@ export default function Home() {
               >
                 {day}
               </div>
-            ))}
+            )})}
           </div>
 
           <div className="grid grid-cols-7 text-sm">
@@ -227,10 +239,12 @@ export default function Home() {
                     )}
                     disabled={isBefore(day, today)}
                   >
-                    <span className="hidden group-hover:flex absolute top-0 -translate-x-.5 -translate-y-4 z-10 text-[11px] bg-slate-900 text-slate-100 px-1 rounded-md gap-1">
-                      <span>{availableTimesInThisMonth[dayIdx]}</span>
-                      <span>Available</span>
-                    </span>
+                    {isAfter(day, startOfYesterday()) && (
+                      <span className="hidden group-hover:flex absolute top-0 -translate-x-.5 -translate-y-4 z-10 text-[11px] bg-slate-900 text-slate-100 px-1 rounded-md gap-1">
+                        <span>{availableTimesInThisMonth[dayIdx]}</span>
+                        <span>Available</span>
+                      </span>
+                    )}
 
                     <time
                       dateTime={format(day, "yyyy-MM-dd")}
@@ -251,8 +265,12 @@ export default function Home() {
                         isEqual(day, today) && "text-blue-900"
                       )}
                     />
-                    
-                    <TimesBar times={availableTimesInThisMonthForEachDay[dayIdx]} />
+
+                    {isAfter(day, startOfYesterday()) && (
+                      <TimesBar
+                        times={availableTimesInThisMonthForEachDay[dayIdx]}
+                      />
+                    )}
                   </button>
                 </div>
               )
