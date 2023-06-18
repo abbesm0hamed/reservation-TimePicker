@@ -34,7 +34,14 @@ import TimesBar from "./components/timesBar"
 
 const inter = Inter({ subsets: ["latin"], weight: "400" })
 
-
+const reservations = [
+  addHours(startOfToday(), 5).toString(),
+  addHours(startOfToday(), 6).toString(),
+  addHours(startOfToday(), 7).toString(),
+  addHours(startOfToday(), 8).toString(),
+  addHours(startOfToday(), 9).toString(),
+  addDays(new Date(addHours(startOfToday(), 4)), 3).toString(),
+]
 
 export default function Home() {
   
@@ -46,25 +53,11 @@ export default function Home() {
   let [currentMonth, setCurrentMonth] = useState(format(today, "MMM-yyyy"))
   let [selectedDay, setSelectedDay] = useState(today)
   let firstDayCurrentMonth = parse(currentMonth, "MMM-yyyy", new Date())
-  let days = eachDayOfInterval({
+  let days = useMemo(() => eachDayOfInterval({
     start: startOfWeek(firstDayCurrentMonth, { weekStartsOn: 1 }),
     end: endOfWeek(endOfMonth(firstDayCurrentMonth), { weekStartsOn: 1 }),
-  })
+  }), [firstDayCurrentMonth])
 
-  // console.log(addDays(new Date(addHours(today, 4)), 3).toString())
-  // reservations array 
-  const reservations = [
-    addHours(today, 5).toString(),
-    addHours(today, 6).toString(),
-    addHours(today, 7).toString(),
-    addHours(today, 8).toString(),
-    addHours(today, 9).toString(),
-    addDays(new Date(addHours(today, 4)), 3).toString(),
-  ]
-
-
-  // send available times for the selected day to the hours component
-  let [freeTimes, setFreeTimes] = useState<Date[]>([])
 
   // all days avaiilable times in this month until you change it 
   const [availableTimesInThisMonth, setAvailableTimesInThisMonth] = useState<
@@ -83,7 +76,7 @@ export default function Home() {
   }
 
   // get available times for the selected day
-  useMemo(() => {
+  const freeTimes = useMemo(() => {
     const StartOfToday = startOfDay(selectedDay)
     const endOfToday = endOfDay(selectedDay)
     // change your working hours here
@@ -101,7 +94,8 @@ export default function Home() {
     let freeTimes = hoursInDay.filter(
       (hour) => !reservations.includes(parseISO(hour.toISOString()).toString())
     )
-    setFreeTimes(freeTimes)
+
+    return (freeTimes)
     
   }, [selectedDay])
 
